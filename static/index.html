@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diagram Builder</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div>
+        <p class="eyebrow">Diagram Builder</p>
+        <h1>Build flowcharts with drag-and-drop blocks.</h1>
+        <p class="sidebar-copy">
+          Drag blocks onto the canvas, move them around, and connect them with arrows.
+          Save your work as a JSON file and load it back later.
+        </p>
+      </div>
+
+      <section class="panel">
+        <h2>Palette</h2>
+        <div class="palette">
+          <button class="palette-preview" type="button" data-node-type="box">
+            <span class="palette-preview-box preset-ocean">
+              <strong>Box</strong>
+              <span>Drag this onto the canvas</span>
+            </span>
+          </button>
+          <button class="palette-preview" type="button" data-node-type="text">
+            <span class="palette-preview-text">
+              <strong>Text</strong>
+              <span>Place free text on the grid</span>
+            </span>
+          </button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Selected Box</h2>
+        <div class="field-group">
+          <label for="node-title">Title</label>
+          <input id="node-title" type="text" placeholder="Select a box to edit" />
+        </div>
+        <div class="field-group">
+          <label for="node-body">Description</label>
+          <textarea id="node-body" rows="5" placeholder="Add supporting text"></textarea>
+        </div>
+        <div class="field-group">
+          <label>Preset Colors</label>
+          <div id="color-presets" class="color-presets"></div>
+        </div>
+        <div class="field-group">
+          <label for="node-color">Custom Color</label>
+          <input id="node-color" type="color" value="#176b87" />
+        </div>
+        <div class="field-group">
+          <button id="save-preset" type="button" class="ghost-button">Save Current Color As Preset</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Status</h2>
+        <p id="status-text" class="status-text">Drag a block onto the canvas to start a new diagram.</p>
+      </section>
+    </aside>
+
+    <main class="workspace">
+      <div class="toolbar">
+        <div class="workspace-actions" aria-label="Diagram actions">
+          <button id="save-json" class="toolbar-action primary-toolbar-action" type="button">
+            <span class="toolbar-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M5 3h11l3 3v15H5z"></path>
+                <path d="M8 3v6h7V3"></path>
+                <path d="M8 16h8"></path>
+              </svg>
+            </span>
+            <span>Save</span>
+          </button>
+          <label class="toolbar-action" for="load-json">
+            <span class="toolbar-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M12 3v11"></path>
+                <path d="M8 10l4 4 4-4"></path>
+                <path d="M5 18h14"></path>
+              </svg>
+            </span>
+            <span>Load</span>
+          </label>
+          <input id="load-json" type="file" accept=".json,application/json" hidden />
+          <button id="connect-toggle" class="toolbar-action" type="button">
+            <span class="toolbar-action-icon arrow-toolbar-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="5" cy="12" r="1.9"></circle>
+                <circle cx="19" cy="12" r="1.9"></circle>
+                <path d="M6.9 12h10.2"></path>
+                <path d="M12 8.8l4.5 3.2-4.5 3.2"></path>
+              </svg>
+            </span>
+            <span>Arrow</span>
+          </button>
+          <button id="delete-selected" class="toolbar-action" type="button">
+            <span class="toolbar-action-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <path d="M9 5.5h6"></path>
+                <path d="M6.5 7.5h11"></path>
+                <path d="M8.5 7.5l.8 10h5.4l.8-10"></path>
+                <path d="M10.5 10.5v4.5"></path>
+                <path d="M13.5 10.5v4.5"></path>
+              </svg>
+            </span>
+            <span>Delete</span>
+          </button>
+          <span class="autosave-text" id="autosave-indicator">Autosave ready</span>
+        </div>
+        <div class="toolbar-badges">
+          <span class="tip-text">Tip: click one box, then another in connect mode</span>
+        </div>
+        <div class="zoom-controls" aria-label="Canvas zoom controls">
+          <button id="zoom-out" class="zoom-button" type="button" aria-label="Zoom out">-</button>
+          <span id="zoom-level" class="badge muted">100%</span>
+          <button id="zoom-in" class="zoom-button" type="button" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+
+      <section id="canvas" class="canvas" aria-label="Diagram canvas">
+        <div id="canvas-viewport" class="canvas-viewport">
+          <div id="canvas-stage" class="canvas-stage">
+            <div class="grid-surface" aria-hidden="true"></div>
+            <svg id="connections" class="connections">
+              <defs>
+                <marker
+                  id="arrowhead"
+                  markerWidth="12"
+                  markerHeight="8"
+                  refX="10"
+                  refY="4"
+                  orient="auto"
+                  markerUnits="strokeWidth"
+                >
+                  <path d="M0,0 L12,4 L0,8 Z"></path>
+                </marker>
+              </defs>
+            </svg>
+            <svg id="connection-hit-layer" class="connection-hit-layer" aria-hidden="true"></svg>
+          </div>
+        </div>
+        <div id="color-popover" class="color-popover hidden">
+          <p class="popover-title">Box Color</p>
+          <div id="popover-swatches" class="popover-swatches"></div>
+          <label class="popover-label" for="popover-color-input">Custom</label>
+          <input id="popover-color-input" type="color" value="#176b87" />
+          <label class="popover-label" for="popover-preset-name">Save as preset</label>
+          <div class="popover-save-row">
+            <input id="popover-preset-name" type="text" maxlength="20" placeholder="Preset name" />
+            <button id="popover-save-preset" type="button" class="ghost-button compact-button">Save</button>
+          </div>
+        </div>
+        <div id="preset-context-menu" class="preset-context-menu hidden">
+          <button id="delete-preset-action" class="preset-context-action" type="button">Delete preset</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="node-template">
+    <article class="diagram-node">
+      <button class="node-accent" type="button" aria-label="Change box color"></button>
+      <header class="node-header">
+        <h3 class="node-title"></h3>
+      </header>
+      <p class="node-body"></p>
+      <button class="node-resize-handle" type="button" aria-label="Resize text"></button>
+    </article>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+{
+  "nodes": [
+    {
+      "id": "node-client",
+      "type": "box",
+      "x": 860,
+      "y": 180,
+      "width": 220,
+      "height": 120,
+      "title": "Client",
+      "body": "Browser or mobile app used by the customer.",
+      "color": "#176b87",
+      "preset": "ocean"
+    },
+    {
+      "id": "node-frontend",
+      "type": "box",
+      "x": 860,
+      "y": 360,
+      "width": 220,
+      "height": 120,
+      "title": "Frontend",
+      "body": "React / HTML / CSS renders the UI and handles user input.",
+      "color": "#c7642b",
+      "preset": "sunset"
+    },
+    {
+      "id": "node-api",
+      "type": "box",
+      "x": 860,
+      "y": 540,
+      "width": 220,
+      "height": 120,
+      "title": "API",
+      "body": "Node / Python service handles business logic and validation.",
+      "color": "#628f37",
+      "preset": "moss"
+    },
+    {
+      "id": "node-db",
+      "type": "box",
+      "x": 860,
+      "y": 720,
+      "width": 220,
+      "height": 120,
+      "title": "Database",
+      "body": "Stores users, products, orders, and application state.",
+      "color": "#7a4d98",
+      "preset": "plum"
+    },
+    {
+      "id": "node-auth",
+      "type": "box",
+      "x": 1180,
+      "y": 540,
+      "width": 220,
+      "height": 120,
+      "title": "Auth Service",
+      "body": "Handles login, sessions, and token verification.",
+      "color": "#34386f",
+      "preset": "thing"
+    },
+    {
+      "id": "node-cdn",
+      "type": "box",
+      "x": 540,
+      "y": 360,
+      "width": 220,
+      "height": 120,
+      "title": "CDN",
+      "body": "Serves images, scripts, and cached static assets quickly.",
+      "color": "#30356c",
+      "preset": "god"
+    },
+    {
+      "id": "node-note",
+      "type": "text",
+      "x": 1160,
+      "y": 235,
+      "width": 250,
+      "height": 56,
+      "title": "Simple full-stack example",
+      "body": "",
+      "color": "#176b87",
+      "preset": null
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-client-frontend",
+      "from": "node-client",
+      "to": "node-frontend"
+    },
+    {
+      "id": "edge-frontend-api",
+      "from": "node-frontend",
+      "to": "node-api"
+    },
+    {
+      "id": "edge-api-db",
+      "from": "node-api",
+      "to": "node-db"
+    },
+    {
+      "id": "edge-api-auth",
+      "from": "node-api",
+      "to": "node-auth"
+    },
+    {
+      "id": "edge-cdn-frontend",
+      "from": "node-cdn",
+      "to": "node-frontend"
+    }
+  ]
+}
