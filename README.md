@@ -1,3 +1,4 @@
+Built with Codex for Handshake's Codex Creator Challenge
 # Diagram Builder
 
 Diagram Builder is a local web app for creating simple diagrams with drag-and-drop boxes and arrows.
